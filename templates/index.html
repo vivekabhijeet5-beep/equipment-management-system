@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Equipment Management System</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+
+        /* =====================================================
+           DASHBOARD PREMIUM UI
+           ===================================================== */
+
+        .dashboard-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 28px;
+            gap: 20px;
+        }
+
+        .dashboard-heading h2 {
+            font-size: 30px;
+            color: #0f172a;
+            margin-bottom: 7px;
+            letter-spacing: -0.5px;
+        }
+
+        .dashboard-heading p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .dashboard-date {
+            color: #64748b;
+            font-size: 13px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 9px 13px;
+            border-radius: 9px;
+        }
+
+
+        /* =====================================================
+           STAT CARDS
+           ===================================================== */
+
+        .premium-stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .premium-stat {
+            position: relative;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 21px;
+            overflow: hidden;
+            box-shadow: 0 7px 24px rgba(15, 23, 42, 0.07);
+            transition: all 0.25s ease;
+        }
+
+        .premium-stat:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 35px rgba(15, 23, 42, 0.12);
+        }
+
+        .premium-stat::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: #2563eb;
+        }
+
+        .premium-stat.available::before {
+            background: #16a34a;
+        }
+
+        .premium-stat.repair::before {
+            background: #f97316;
+        }
+
+        .premium-stat.vendor::before {
+            background: #7c3aed;
+        }
+
+        .premium-stat.quotation::before {
+            background: #db2777;
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 17px;
+        }
+
+        .premium-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .available .premium-icon {
+            background: #ecfdf5;
+            color: #16a34a;
+        }
+
+        .repair .premium-icon {
+            background: #fff7ed;
+            color: #ea580c;
+        }
+
+        .vendor .premium-icon {
+            background: #f5f3ff;
+            color: #7c3aed;
+        }
+
+        .quotation .premium-icon {
+            background: #fdf2f8;
+            color: #db2777;
+        }
+
+        .stat-arrow {
+            color: #94a3b8;
+            font-size: 15px;
+        }
+
+        .premium-stat h3 {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .premium-number {
+            color: #0f172a;
+            font-size: 31px;
+            font-weight: 750;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-description {
+            color: #94a3b8;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+
+        /* =====================================================
+           QUICK ACTIONS
+           ===================================================== */
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-title h2 {
+            font-size: 20px;
+            color: #0f172a;
+        }
+
+        .section-title p {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 13px;
+            margin-bottom: 32px;
+        }
+
+        .quick-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            color: #334155;
+            text-decoration: none;
+            box-shadow: 0 5px 17px rgba(15, 23, 42, 0.05);
+            transition: all 0.22s ease;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-3px);
+            border-color: #bfdbfe;
+            background: #f8fbff;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.10);
+        }
+
+        .quick-icon {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9px;
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .quick-card strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .quick-card span {
+            display: block;
+            color: #94a3b8;
+            font-size: 10px;
+        }
+
+
+        /* =====================================================
+           RECENT EQUIPMENT
+           ===================================================== */
+
+        .recent-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 7px 24px rgba(15, 23, 42, 0.07);
+            margin-bottom: 25px;
+        }
+
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 19px 21px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .recent-header h3 {
+            color: #0f172a;
+            font-size: 17px;
+        }
+
+        .recent-header p {
+            color: #94a3b8;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        .view-all {
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .view-all:hover {
+            text-decoration: underline;
+        }
+
+        .recent-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .recent-table th {
+            background: #f8fafc;
+            color: #64748b;
+            padding: 12px 15px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .recent-table td {
+            padding: 14px 15px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+        }
+
+        .recent-table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .recent-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .recent-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .equipment-name {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .equipment-model {
+            color: #94a3b8;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        .quantity-pill {
+            display: inline-block;
+            min-width: 28px;
+            text-align: center;
+            padding: 5px 8px;
+            border-radius: 7px;
+            background: #f1f5f9;
+            color: #334155;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .location-text {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .vendor-text {
+            color: #475569;
+            font-size: 12px;
+        }
+
+
+        /* =====================================================
+           STATUS
+           ===================================================== */
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .status-pill.available {
+            background: #ecfdf5;
+            color: #15803d;
+        }
+
+        .status-pill.repair {
+            background: #fff7ed;
+            color: #c2410c;
+        }
+
+        .status-pill.working {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .status-pill.other {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+
+        /* =====================================================
+           EMPTY STATE
+           ===================================================== */
+
+        .dashboard-empty {
+            padding: 55px 20px;
+            text-align: center;
+        }
+
+        .dashboard-empty-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .dashboard-empty h3 {
+            color: #0f172a;
+            margin-bottom: 7px;
+        }
+
+        .dashboard-empty p {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+
+        /* =====================================================
+           FOOTER
+           ===================================================== */
+
+        .dashboard-footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 11px;
+            padding: 5px 0 25px;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 1150px) {
+
+            .premium-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .quick-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+        }
+
+
+        @media (max-width: 750px) {
+
+            .dashboard-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .premium-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .quick-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .recent-card {
+                overflow-x: auto;
+            }
+
+            .recent-table {
+                min-width: 750px;
+            }
+
+        }
+
+
+        @media (max-width: 500px) {
+
+            .premium-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-heading h2 {
+                font-size: 25px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <div class="header">
+
+        <h1>
+            Equipment Management System
+        </h1>
+
+        <p>
+            Equipment Inventory & Quotation Management
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         NAVIGATION
+         ===================================================== -->
+
+    <nav>
+
+        <a href="/">
+            Dashboard
+        </a>
+
+        <a href="/view">
+            Equipment
+        </a>
+
+        <a href="/vendors">
+            Vendors
+        </a>
+
+        <a href="/quotations">
+            Quotations
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </nav>
+
+
+    <!-- =====================================================
+         DASHBOARD HEADING
+         ===================================================== -->
+
+    <div class="dashboard-heading">
+
+        <div>
+
+            <h2>
+                Dashboard
+            </h2>
+
+            <p>
+                Overview of your equipment, vendors and quotations
+            </p>
+
+        </div>
+
+        <div class="dashboard-date">
+            📊 Inventory Overview
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         STATISTICS
+         ===================================================== -->
+
+    <div class="premium-stats">
+
+
+        <!-- TOTAL EQUIPMENT -->
+
+        <div class="premium-stat">
+
+            <div class="stat-top">
+
+                <div class="premium-icon">
+                    📦
+                </div>
+
+                <span class="stat-arrow">
+                    →
+                </span>
+
+            </div>
+
+            <h3>
+                TOTAL EQUIPMENT
+            </h3>
+
+            <div class="premium-number">
+                {{ total_equipment }}
+            </div>
+
+            <div class="stat-description">
+                Equipment records
+            </div>
+
+        </div>
+
+
+        <!-- AVAILABLE -->
+
+        <div class="premium-stat available">
+
+            <div class="stat-top">
+
+                <div class="premium-icon">
+                    ✓
+                </div>
+
+                <span class="stat-arrow">
+                    →
+                </span>
+
+            </div>
+
+            <h3>
+                AVAILABLE
+            </h3>
+
+            <div class="premium-number">
+                {{ available_equipment }}
+            </div>
+
+            <div class="stat-description">
+                Ready for use
+            </div>
+
+        </div>
+
+
+        <!-- UNDER REPAIR -->
+
+        <div class="premium-stat repair">
+
+            <div class="stat-top">
+
+                <div class="premium-icon">
+                    🔧
+                </div>
+
+                <span class="stat-arrow">
+                    →
+                </span>
+
+            </div>
+
+            <h3>
+                UNDER REPAIR
+            </h3>
+
+            <div class="premium-number">
+                {{ under_repair }}
+            </div>
+
+            <div class="stat-description">
+                Requires attention
+            </div>
+
+        </div>
+
+
+        <!-- VENDORS -->
+
+        <div class="premium-stat vendor">
+
+            <div class="stat-top">
+
+                <div class="premium-icon">
+                    🏢
+                </div>
+
+                <span class="stat-arrow">
+                    →
+                </span>
+
+            </div>
+
+            <h3>
+                TOTAL VENDORS
+            </h3>
+
+            <div class="premium-number">
+                {{ total_vendors }}
+            </div>
+
+            <div class="stat-description">
+                Registered suppliers
+            </div>
+
+        </div>
+
+
+        <!-- QUOTATIONS -->
+
+        <div class="premium-stat quotation">
+
+            <div class="stat-top">
+
+                <div class="premium-icon">
+                    📄
+                </div>
+
+                <span class="stat-arrow">
+                    →
+                </span>
+
+            </div>
+
+            <h3>
+                QUOTATIONS
+            </h3>
+
+            <div class="premium-number">
+                {{ total_quotations }}
+            </div>
+
+            <div class="stat-description">
+                Supplier quotations
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         QUICK ACTIONS
+         ===================================================== -->
+
+    <div class="section-title">
+
+        <div>
+
+            <h2>
+                Quick Actions
+            </h2>
+
+            <p>
+                Common tasks
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="quick-grid">
+
+
+        <a href="/add"
+           class="quick-card">
+
+            <div class="quick-icon">
+                ➕
+            </div>
+
+            <div>
+
+                <strong>
+                    Add Equipment
+                </strong>
+
+                <span>
+                    Register new equipment
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <a href="/view"
+           class="quick-card">
+
+            <div class="quick-icon">
+                📦
+            </div>
+
+            <div>
+
+                <strong>
+                    View Inventory
+                </strong>
+
+                <span>
+                    Browse all equipment
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <a href="/search"
+           class="quick-card">
+
+            <div class="quick-icon">
+                🔍
+            </div>
+
+            <div>
+
+                <strong>
+                    Search Equipment
+                </strong>
+
+                <span>
+                    Find equipment quickly
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <a href="/add_vendor"
+           class="quick-card">
+
+            <div class="quick-icon">
+                🏢
+            </div>
+
+            <div>
+
+                <strong>
+                    Add Vendor
+                </strong>
+
+                <span>
+                    Register supplier
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <a href="/add_quotation"
+           class="quick-card">
+
+            <div class="quick-icon">
+                📄
+            </div>
+
+            <div>
+
+                <strong>
+                    Add Quotation
+                </strong>
+
+                <span>
+                    Create quotation
+                </span>
+
+            </div>
+
+        </a>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         RECENT EQUIPMENT
+         ===================================================== -->
+
+    <div class="recent-card">
+
+
+        <div class="recent-header">
+
+            <div>
+
+                <h3>
+                    Recent Equipment
+                </h3>
+
+                <p>
+                    Latest equipment records in your inventory
+                </p>
+
+            </div>
+
+            <a href="/view"
+               class="view-all">
+
+                View All →
+
+            </a>
+
+        </div>
+
+
+        {% if recent_equipment %}
+
+
+        <table class="recent-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Equipment
+                    </th>
+
+                    <th>
+                        Quantity
+                    </th>
+
+                    <th>
+                        Location
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Vendor
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+                {% for equipment in recent_equipment %}
+
+                <tr>
+
+
+                    <!-- EQUIPMENT -->
+
+                    <td>
+
+                        <div class="equipment-name">
+
+                            {{ equipment[1] }}
+
+                        </div>
+
+                        <div class="equipment-model">
+
+                            {{ equipment[2] }}
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- QUANTITY -->
+
+                    <td>
+
+                        <span class="quantity-pill">
+
+                            {{ equipment[3] }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- LOCATION -->
+
+                    <td>
+
+                        <span class="location-text">
+
+                            📍 {{ equipment[4] }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- STATUS -->
+
+                    <td>
+
+
+                        {% if equipment[5]|lower == "available" %}
+
+                            <span class="status-pill available">
+                                ● Available
+                            </span>
+
+
+                        {% elif equipment[5]|lower == "under repair" %}
+
+                            <span class="status-pill repair">
+                                ● Under Repair
+                            </span>
+
+
+                        {% elif equipment[5]|lower == "working" %}
+
+                            <span class="status-pill working">
+                                ● Working
+                            </span>
+
+
+                        {% else %}
+
+                            <span class="status-pill other">
+                                ● {{ equipment[5] }}
+                            </span>
+
+                        {% endif %}
+
+
+                    </td>
+
+
+                    <!-- VENDOR -->
+
+                    <td>
+
+                        <span class="vendor-text">
+
+                            {{ equipment[6] }}
+
+                        </span>
+
+                    </td>
+
+
+                </tr>
+
+                {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+
+        {% else %}
+
+
+        <div class="dashboard-empty">
+
+            <div class="dashboard-empty-icon">
+                📦
+            </div>
+
+            <h3>
+                No Equipment Yet
+            </h3>
+
+            <p>
+                Add equipment to start building your inventory.
+            </p>
+
+            <a href="/add">
+
+                <button>
+                    + Add Equipment
+                </button>
+
+            </a>
+
+        </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
+
+    <div class="dashboard-footer">
+
+        Equipment Management System
+        •
+        Inventory & Quotation Management
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Add Vendor</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+
+        .form-page {
+            max-width: 900px;
+            margin: 30px auto 50px;
+        }
+
+        .form-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .form-card-header {
+            padding: 25px 28px;
+            border-bottom: 1px solid #e2e8f0;
+            background: linear-gradient(
+                135deg,
+                #f8fbff,
+                #ffffff
+            );
+        }
+
+        .form-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f3ff;
+            color: #7c3aed;
+            border-radius: 12px;
+            font-size: 21px;
+            margin-bottom: 15px;
+        }
+
+        .form-card-header h2 {
+            margin: 0 0 6px;
+            color: #0f172a;
+            font-size: 24px;
+        }
+
+        .form-card-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .vendor-form {
+            padding: 28px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            color: #334155;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            box-sizing: border-box;
+
+            padding: 12px 13px;
+
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+
+            background: #f8fafc;
+
+            color: #0f172a;
+
+            font-size: 13px;
+
+            outline: none;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .input-wrapper input {
+            padding-left: 40px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        .form-group input:hover,
+        .form-group textarea:hover {
+            background: white;
+            border-color: #94a3b8;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            background: white;
+            border-color: #7c3aed;
+
+            box-shadow:
+                0 0 0 3px rgba(124, 58, 237, 0.10);
+        }
+
+        .field-help {
+            margin-top: 6px;
+            color: #94a3b8;
+            font-size: 11px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+
+            margin-top: 28px;
+            padding-top: 22px;
+
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .save-button {
+            border: none;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #7c3aed,
+                    #8b5cf6
+                );
+
+            color: white;
+
+            padding: 12px 20px;
+
+            border-radius: 8px;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 6px 16px rgba(124, 58, 237, 0.20);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .save-button:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 10px 22px rgba(124, 58, 237, 0.28);
+        }
+
+        .cancel-button {
+            display: inline-block;
+
+            text-decoration: none;
+
+            padding: 11px 18px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 8px;
+
+            background: white;
+
+            color: #475569;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            transition:
+                background 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .cancel-button:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        .form-back {
+            margin-top: 18px;
+        }
+
+        .form-back a {
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .form-back a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 700px) {
+
+            .form-page {
+                margin: 20px 10px 40px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: auto;
+            }
+
+            .vendor-form {
+                padding: 20px;
+            }
+
+            .form-card-header {
+                padding: 22px;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .save-button,
+            .cancel-button {
+                width: 100%;
+                text-align: center;
+                box-sizing: border-box;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>
+            Equipment Management System
+        </h1>
+
+        <p>
+            Equipment Inventory & Quotation Management
+        </p>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+
+    <nav>
+
+        <a href="/">
+            Dashboard
+        </a>
+
+        <a href="/view">
+            Equipment
+        </a>
+
+        <a href="/vendors">
+            Vendors
+        </a>
+
+        <a href="/quotations">
+            Quotations
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </nav>
+
+
+    <!-- FORM -->
+
+    <div class="form-page">
+
+
+        <div class="form-card">
+
+
+            <!-- FORM HEADER -->
+
+            <div class="form-card-header">
+
+                <div class="form-icon">
+                    🏢
+                </div>
+
+                <h2>
+                    Add Vendor
+                </h2>
+
+                <p>
+                    Enter the supplier information below to add
+                    a new vendor to your system.
+                </p>
+
+            </div>
+
+
+            <!-- VENDOR FORM -->
+
+            <form
+                method="POST"
+                action="/add_vendor"
+                class="vendor-form"
+            >
+
+
+                <div class="form-grid">
+
+
+                    <!-- VENDOR NAME -->
+
+                    <div class="form-group">
+
+                        <label for="vendor_name">
+
+                            Vendor Name
+                            <span class="required">*</span>
+
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <span class="input-icon">
+                                🏢
+                            </span>
+
+                            <input
+                                type="text"
+                                id="vendor_name"
+                                name="vendor_name"
+                                placeholder="e.g. SVS Technologies"
+                                required
+                            >
+
+                        </div>
+
+                        <span class="field-help">
+                            Enter the company or supplier name.
+                        </span>
+
+                    </div>
+
+
+                    <!-- CONTACT PERSON -->
+
+                    <div class="form-group">
+
+                        <label for="contact_person">
+
+                            Contact Person
+                            <span class="required">*</span>
+
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <span class="input-icon">
+                                👤
+                            </span>
+
+                            <input
+                                type="text"
+                                id="contact_person"
+                                name="contact_person"
+                                placeholder="e.g. Raj Kumar"
+                                required
+                            >
+
+                        </div>
+
+                        <span class="field-help">
+                            Main person to contact.
+                        </span>
+
+                    </div>
+
+
+                    <!-- PHONE -->
+
+                    <div class="form-group">
+
+                        <label for="phone">
+
+                            Phone
+                            <span class="required">*</span>
+
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <span class="input-icon">
+                                📞
+                            </span>
+
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                placeholder="e.g. 9876543210"
+                                required
+                            >
+
+                        </div>
+
+                        <span class="field-help">
+                            Enter the vendor's contact number.
+                        </span>
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+
+                    <div class="form-group">
+
+                        <label for="email">
+
+                            Email
+                            <span class="required">*</span>
+
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <span class="input-icon">
+                                ✉
+                            </span>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="e.g. vendor@example.com"
+                                required
+                            >
+
+                        </div>
+
+                        <span class="field-help">
+                            Enter a valid vendor email address.
+                        </span>
+
+                    </div>
+
+
+                    <!-- ADDRESS -->
+
+                    <div class="form-group full-width">
+
+                        <label for="address">
+
+                            Address
+                            <span class="required">*</span>
+
+                        </label>
+
+                        <textarea
+                            id="address"
+                            name="address"
+                            rows="4"
+                            placeholder="e.g. Gurgaon, Haryana"
+                            required
+                        ></textarea>
+
+                        <span class="field-help">
+                            Enter the vendor's office or business address.
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- BUTTONS -->
+
+                <div class="form-actions">
+
+                    <a
+                        href="/vendors"
+                        class="cancel-button"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="save-button"
+                    >
+                        ✓ Add Vendor
+                    </button>
+
+                </div>
+
+
+            </form>
+
+
+        </div>
+
+
+        <!-- BACK -->
+
+        <div class="form-back">
+
+            <a href="/vendors">
+                ← Back to Vendors
+            </a>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

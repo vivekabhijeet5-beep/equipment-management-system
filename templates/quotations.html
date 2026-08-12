@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Quotation Management</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+
+        .quotation-title {
+            margin-bottom: 24px;
+        }
+
+        .quotation-title h2 {
+            font-size: 28px;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .quotation-title p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .quotation-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .quotation-search {
+            flex: 1;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+        }
+
+        .quotation-search form {
+            display: flex;
+            gap: 10px;
+            margin: 0;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+            background: transparent;
+        }
+
+        .quotation-search input {
+            flex: 1;
+            padding: 12px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .quotation-search input:focus {
+            background: white;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+        }
+
+        .add-quotation {
+            white-space: nowrap;
+            text-decoration: none;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 13px 18px;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.22);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .add-quotation:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.30);
+        }
+
+        .quotation-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
+        }
+
+        .quotation-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .quotation-card-header h3 {
+            font-size: 17px;
+            color: #0f172a;
+        }
+
+        .quotation-count {
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 6px 11px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .quotation-card table {
+            margin: 0;
+        }
+
+        .quotation-card tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .quotation-card tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .quotation-number {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .quotation-vendor {
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .quotation-equipment {
+            color: #475569;
+        }
+
+        .quotation-date {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .quantity-badge {
+            display: inline-block;
+            min-width: 30px;
+            text-align: center;
+            padding: 5px 8px;
+            border-radius: 7px;
+            background: #f1f5f9;
+            color: #334155;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .price {
+            font-weight: 600;
+            color: #334155;
+            white-space: nowrap;
+        }
+
+        .total-price {
+            font-weight: 700;
+            color: #0f172a;
+            white-space: nowrap;
+        }
+
+        .quotation-status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .quotation-status.approved {
+            background: #ecfdf5;
+            color: #15803d;
+        }
+
+        .quotation-status.pending {
+            background: #fff7ed;
+            color: #c2410c;
+        }
+
+        .quotation-status.rejected {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .quotation-status.other {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .quotation-actions-cell {
+            white-space: nowrap;
+        }
+
+        .quotation-btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 7px 10px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 4px;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .quotation-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .quotation-edit {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .quotation-edit:hover {
+            background: #dbeafe;
+        }
+
+        .quotation-delete {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .quotation-delete:hover {
+            background: #fee2e2;
+        }
+
+        .quotation-pdf {
+            background: #f5f3ff;
+            color: #7c3aed;
+        }
+
+        .quotation-pdf:hover {
+            background: #ede9fe;
+        }
+
+        .quotation-empty {
+            text-align: center;
+            padding: 65px 20px;
+        }
+
+        .quotation-empty-icon {
+            font-size: 45px;
+            margin-bottom: 15px;
+        }
+
+        .quotation-empty h3 {
+            color: #0f172a;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .quotation-empty p {
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        .quotation-back {
+            margin-top: 22px;
+            padding-bottom: 30px;
+        }
+
+        .quotation-back a {
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .quotation-back a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1000px) {
+
+            .quotation-card {
+                overflow-x: auto;
+            }
+
+            .quotation-card table {
+                min-width: 1100px;
+            }
+
+        }
+
+        @media (max-width: 900px) {
+
+            .quotation-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .add-quotation {
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>
+            Equipment Management System
+        </h1>
+
+        <p>
+            Equipment Inventory & Quotation Management
+        </p>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+
+    <nav>
+
+        <a href="/">
+            Dashboard
+        </a>
+
+        <a href="/view">
+            Equipment
+        </a>
+
+        <a href="/vendors">
+            Vendors
+        </a>
+
+        <a href="/quotations">
+            Quotations
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </nav>
+
+
+    <!-- PAGE TITLE -->
+
+    <div class="quotation-title">
+
+        <h2>
+            Quotation Management
+        </h2>
+
+        <p>
+            Manage equipment quotations and supplier pricing
+        </p>
+
+    </div>
+
+
+    <!-- SEARCH + ADD -->
+
+    <div class="quotation-actions">
+
+
+        <div class="quotation-search">
+
+            <form action="/quotations"
+                  method="GET">
+
+                <input
+                    type="text"
+                    name="query"
+                    placeholder="Search quotation, vendor, equipment..."
+                    value="{{ request.args.get('query', '') }}"
+                >
+
+                <button type="submit">
+                    🔍 Search
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <a href="/add_quotation"
+           class="add-quotation">
+
+            + Add Quotation
+
+        </a>
+
+
+    </div>
+
+
+    <!-- QUOTATION LIST -->
+
+    <div class="quotation-card">
+
+
+        <div class="quotation-card-header">
+
+            <h3>
+                Quotation List
+            </h3>
+
+            <span class="quotation-count">
+
+                {% if quotations %}
+                    {{ quotations|length }} Quotations
+                {% else %}
+                    0 Quotations
+                {% endif %}
+
+            </span>
+
+        </div>
+
+
+        {% if quotations %}
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        ID
+                    </th>
+
+                    <th>
+                        Quotation No.
+                    </th>
+
+                    <th>
+                        Vendor
+                    </th>
+
+                    <th>
+                        Equipment
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Quantity
+                    </th>
+
+                    <th>
+                        Unit Price
+                    </th>
+
+                    <th>
+                        Total Amount
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Actions
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+                {% for quotation in quotations %}
+
+                <tr>
+
+
+                    <!-- ID -->
+
+                    <td>
+
+                        <strong>
+                            #{{ quotation[0] }}
+                        </strong>
+
+                    </td>
+
+
+                    <!-- QUOTATION NUMBER -->
+
+                    <td>
+
+                        <span class="quotation-number">
+
+                            {{ quotation[1] }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- VENDOR -->
+
+                    <td>
+
+                        <span class="quotation-vendor">
+
+                            {{ quotation[2] }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- EQUIPMENT -->
+
+                    <td>
+
+                        <span class="quotation-equipment">
+
+                            {{ quotation[3] }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- DATE -->
+
+                    <td>
+
+                        <span class="quotation-date">
+
+                            {{ quotation[4] }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- QUANTITY -->
+
+                    <td>
+
+                        <span class="quantity-badge">
+
+                            {{ quotation[5] }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- UNIT PRICE -->
+
+                    <td>
+
+                        <span class="price">
+
+                            ₹{{ "%.2f"|format(quotation[6]|float) }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- TOTAL -->
+
+                    <td>
+
+                        <span class="total-price">
+
+                            ₹{{ "%.2f"|format(quotation[7]|float) }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- STATUS -->
+
+                    <td>
+
+
+                        {% if quotation[8]|lower == "approved" %}
+
+                            <span class="quotation-status approved">
+
+                                ✓ Approved
+
+                            </span>
+
+
+                        {% elif quotation[8]|lower == "pending" %}
+
+                            <span class="quotation-status pending">
+
+                                ⏳ Pending
+
+                            </span>
+
+
+                        {% elif quotation[8]|lower == "rejected" %}
+
+                            <span class="quotation-status rejected">
+
+                                ✕ Rejected
+
+                            </span>
+
+
+                        {% else %}
+
+                            <span class="quotation-status other">
+
+                                {{ quotation[8] }}
+
+                            </span>
+
+                        {% endif %}
+
+
+                    </td>
+
+
+                    <!-- ACTIONS -->
+
+                    <td class="quotation-actions-cell">
+
+
+                        <a
+                            href="/edit_quotation/{{ quotation[0] }}"
+                            class="quotation-btn quotation-edit"
+                        >
+                            Edit
+                        </a>
+
+
+                        <a
+                            href="/delete_quotation/{{ quotation[0] }}"
+                            class="quotation-btn quotation-delete"
+                            onclick="return confirm('Are you sure you want to delete this quotation?');"
+                        >
+                            Delete
+                        </a>
+
+
+                        <a
+                            href="/quotation_pdf/{{ quotation[0] }}"
+                            class="quotation-btn quotation-pdf"
+                        >
+                            PDF
+                        </a>
+
+
+                    </td>
+
+
+                </tr>
+
+                {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+
+        {% else %}
+
+
+        <div class="quotation-empty">
+
+            <div class="quotation-empty-icon">
+                📄
+            </div>
+
+            <h3>
+                No Quotations Found
+            </h3>
+
+            <p>
+                Add your first quotation to start managing supplier pricing.
+            </p>
+
+            <a href="/add_quotation">
+
+                <button>
+                    + Add Quotation
+                </button>
+
+            </a>
+
+        </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+    <!-- BACK -->
+
+    <div class="quotation-back">
+
+        <a href="/">
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

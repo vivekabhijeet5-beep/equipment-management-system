@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Vendor Management</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+
+        /* =====================================================
+           VENDOR PAGE
+           ===================================================== */
+
+        .vendor-title {
+            margin-bottom: 24px;
+        }
+
+        .vendor-title h2 {
+            font-size: 28px;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .vendor-title p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+
+        /* =====================================================
+           TOP BAR
+           ===================================================== */
+
+        .vendor-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+
+        /* =====================================================
+           SEARCH
+           ===================================================== */
+
+        .vendor-search {
+            flex: 1;
+
+            background: white;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 12px;
+
+            padding: 12px;
+
+            box-shadow:
+                0 6px 20px rgba(15, 23, 42, 0.06);
+        }
+
+        .vendor-search form {
+            display: flex;
+            gap: 10px;
+
+            padding: 0;
+
+            margin: 0;
+
+            background: transparent;
+
+            border: none;
+
+            box-shadow: none;
+        }
+
+        .vendor-search input {
+            flex: 1;
+
+            padding: 12px 14px;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 8px;
+
+            background: #f8fafc;
+
+            outline: none;
+
+            font-size: 14px;
+        }
+
+        .vendor-search input:focus {
+            background: white;
+
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px rgba(37, 99, 235, 0.10);
+        }
+
+
+        /* =====================================================
+           ADD VENDOR
+           ===================================================== */
+
+        .add-vendor {
+            white-space: nowrap;
+
+            text-decoration: none;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #3b82f6
+                );
+
+            color: white;
+
+            padding: 13px 18px;
+
+            border-radius: 9px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            box-shadow:
+                0 6px 18px rgba(37, 99, 235, 0.22);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .add-vendor:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 10px 25px rgba(37, 99, 235, 0.30);
+        }
+
+
+        /* =====================================================
+           VENDOR CARD
+           ===================================================== */
+
+        .vendor-card {
+            background: white;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 14px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 8px 25px rgba(15, 23, 42, 0.08);
+        }
+
+        .vendor-card-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            padding: 18px 20px;
+
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .vendor-card-header h3 {
+            font-size: 17px;
+
+            color: #0f172a;
+        }
+
+        .vendor-count {
+            background: #eff6ff;
+
+            color: #2563eb;
+
+            padding: 6px 11px;
+
+            border-radius: 999px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+
+        /* =====================================================
+           TABLE
+           ===================================================== */
+
+        .vendor-card table {
+            margin: 0;
+        }
+
+        .vendor-card tbody tr {
+            transition:
+                background 0.2s ease;
+        }
+
+        .vendor-card tbody tr:hover {
+            background: #f8fafc;
+        }
+
+
+        /* =====================================================
+           VENDOR NAME
+           ===================================================== */
+
+        .vendor-name {
+            font-weight: 700;
+
+            color: #0f172a;
+        }
+
+        .vendor-contact {
+            color: #475569;
+
+            font-size: 13px;
+        }
+
+
+        /* =====================================================
+           CONTACT DETAILS
+           ===================================================== */
+
+        .contact-item {
+            display: block;
+
+            margin-bottom: 4px;
+
+            color: #475569;
+
+            font-size: 13px;
+        }
+
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+
+
+        /* =====================================================
+           ADDRESS
+           ===================================================== */
+
+        .vendor-address {
+            color: #64748b;
+
+            font-size: 13px;
+
+            max-width: 220px;
+
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           ACTION BUTTONS
+           ===================================================== */
+
+        .vendor-actions-cell {
+            white-space: nowrap;
+        }
+
+        .vendor-btn {
+            display: inline-block;
+
+            text-decoration: none;
+
+            padding: 7px 11px;
+
+            border-radius: 7px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            margin-right: 4px;
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .vendor-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .vendor-edit {
+            background: #eff6ff;
+
+            color: #2563eb;
+        }
+
+        .vendor-edit:hover {
+            background: #dbeafe;
+        }
+
+        .vendor-delete {
+            background: #fef2f2;
+
+            color: #dc2626;
+        }
+
+        .vendor-delete:hover {
+            background: #fee2e2;
+        }
+
+
+        /* =====================================================
+           EMPTY STATE
+           ===================================================== */
+
+        .vendor-empty {
+            text-align: center;
+
+            padding: 65px 20px;
+        }
+
+        .vendor-empty-icon {
+            font-size: 45px;
+
+            margin-bottom: 15px;
+        }
+
+        .vendor-empty h3 {
+            color: #0f172a;
+
+            font-size: 20px;
+
+            margin-bottom: 8px;
+        }
+
+        .vendor-empty p {
+            color: #64748b;
+
+            margin-bottom: 20px;
+        }
+
+
+        /* =====================================================
+           BACK
+           ===================================================== */
+
+        .vendor-back {
+            margin-top: 22px;
+
+            padding-bottom: 30px;
+        }
+
+        .vendor-back a {
+            color: #2563eb;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            font-weight: 600;
+        }
+
+        .vendor-back a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 900px) {
+
+            .vendor-actions {
+                flex-direction: column;
+
+                align-items: stretch;
+            }
+
+            .add-vendor {
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <div class="header">
+
+        <h1>
+            Equipment Management System
+        </h1>
+
+        <p>
+            Equipment Inventory & Quotation Management
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         NAVIGATION
+         ===================================================== -->
+
+    <nav>
+
+        <a href="/">
+            Dashboard
+        </a>
+
+        <a href="/view">
+            Equipment
+        </a>
+
+        <a href="/vendors">
+            Vendors
+        </a>
+
+        <a href="/quotations">
+            Quotations
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </nav>
+
+
+    <!-- =====================================================
+         PAGE TITLE
+         ===================================================== -->
+
+    <div class="vendor-title">
+
+        <h2>
+            Vendor Management
+        </h2>
+
+        <p>
+            Manage suppliers and vendor contact information
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         SEARCH + ADD
+         ===================================================== -->
+
+    <div class="vendor-actions">
+
+
+        <div class="vendor-search">
+
+            <form action="/vendors"
+                  method="GET">
+
+                <input
+                    type="text"
+                    name="query"
+                    placeholder="Search vendor, contact, phone, email..."
+                    value="{{ request.args.get('query', '') }}"
+                >
+
+                <button type="submit">
+                    🔍 Search
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <a href="/add_vendor"
+           class="add-vendor">
+
+            + Add Vendor
+
+        </a>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         VENDOR LIST
+         ===================================================== -->
+
+    <div class="vendor-card">
+
+
+        <div class="vendor-card-header">
+
+            <h3>
+                Vendor List
+            </h3>
+
+            <span class="vendor-count">
+
+                {% if vendors %}
+                    {{ vendors|length }} Vendors
+                {% else %}
+                    0 Vendors
+                {% endif %}
+
+            </span>
+
+        </div>
+
+
+        {% if vendors %}
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        ID
+                    </th>
+
+                    <th>
+                        Vendor
+                    </th>
+
+                    <th>
+                        Contact Person
+                    </th>
+
+                    <th>
+                        Phone
+                    </th>
+
+                    <th>
+                        Email
+                    </th>
+
+                    <th>
+                        Address
+                    </th>
+
+                    <th>
+                        Actions
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+                {% for vendor in vendors %}
+
+                <tr>
+
+
+                    <!-- ID -->
+
+                    <td>
+
+                        <strong>
+                            #{{ vendor[0] }}
+                        </strong>
+
+                    </td>
+
+
+                    <!-- VENDOR -->
+
+                    <td>
+
+                        <div class="vendor-name">
+                            {{ vendor[1] }}
+                        </div>
+
+                    </td>
+
+
+                    <!-- CONTACT PERSON -->
+
+                    <td>
+
+                        <span class="vendor-contact">
+
+                            👤 {{ vendor[2] }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- PHONE -->
+
+                    <td>
+
+                        <span class="contact-item">
+
+                            📞 {{ vendor[3] }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- EMAIL -->
+
+                    <td>
+
+                        <span class="contact-item">
+
+                            ✉️ {{ vendor[4] }}
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- ADDRESS -->
+
+                    <td>
+
+                        <div class="vendor-address">
+
+                            📍 {{ vendor[5] }}
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- ACTIONS -->
+
+                    <td class="vendor-actions-cell">
+
+
+                        <a
+                            href="/edit_vendor/{{ vendor[0] }}"
+                            class="vendor-btn vendor-edit"
+                        >
+                            Edit
+                        </a>
+
+
+                        <a
+                            href="/delete_vendor/{{ vendor[0] }}"
+                            class="vendor-btn vendor-delete"
+                            onclick="return confirm('Are you sure you want to delete this vendor?');"
+                        >
+                            Delete
+                        </a>
+
+
+                    </td>
+
+
+                </tr>
+
+                {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+
+        {% else %}
+
+
+        <div class="vendor-empty">
+
+            <div class="vendor-empty-icon">
+                🏢
+            </div>
+
+            <h3>
+                No Vendors Found
+            </h3>
+
+            <p>
+                Add your first vendor to start managing suppliers.
+            </p>
+
+            <a href="/add_vendor">
+
+                <button>
+                    + Add Vendor
+                </button>
+
+            </a>
+
+        </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+    <!-- =====================================================
+         BACK
+         ===================================================== -->
+
+    <div class="vendor-back">
+
+        <a href="/">
+            ← Back to Dashboard
+        </a>
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

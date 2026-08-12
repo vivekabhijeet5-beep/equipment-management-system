@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Quotation</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+
+        .form-page {
+            max-width: 950px;
+            margin: 30px auto 50px;
+        }
+
+        .form-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .form-card-header {
+            padding: 25px 28px;
+
+            border-bottom: 1px solid #e2e8f0;
+
+            background: linear-gradient(
+                135deg,
+                #fff8fc,
+                #ffffff
+            );
+        }
+
+        .form-icon {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #fdf2f8;
+            color: #db2777;
+
+            border-radius: 12px;
+
+            font-size: 21px;
+
+            margin-bottom: 15px;
+        }
+
+        .form-card-header h2 {
+            margin: 0 0 6px;
+
+            color: #0f172a;
+
+            font-size: 24px;
+        }
+
+        .form-card-header p {
+            margin: 0;
+
+            color: #64748b;
+
+            font-size: 13px;
+        }
+
+        .quotation-form {
+            padding: 28px;
+        }
+
+        .form-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 22px;
+        }
+
+        .form-group {
+            display: flex;
+
+            flex-direction: column;
+        }
+
+        .form-group label {
+            color: #334155;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            margin-bottom: 8px;
+        }
+
+        .required {
+            color: #dc2626;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+
+            left: 13px;
+
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            color: #94a3b8;
+
+            font-size: 14px;
+
+            pointer-events: none;
+        }
+
+        .form-group input,
+        .form-group select {
+
+            width: 100%;
+
+            box-sizing: border-box;
+
+            padding: 12px 13px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 9px;
+
+            background: #f8fafc;
+
+            color: #0f172a;
+
+            font-size: 13px;
+
+            outline: none;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .input-wrapper input {
+            padding-left: 40px;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover {
+
+            background: white;
+
+            border-color: #94a3b8;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+
+            background: white;
+
+            border-color: #db2777;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(219, 39, 119, 0.10);
+        }
+
+        .field-help {
+
+            margin-top: 6px;
+
+            color: #94a3b8;
+
+            font-size: 11px;
+        }
+
+
+        /* PRICE SECTION */
+
+        .price-section {
+
+            grid-column: 1 / -1;
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 22px;
+
+            padding: 20px;
+
+            background: #f8fafc;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 12px;
+        }
+
+
+        /* TOTAL */
+
+        .total-wrapper {
+            position: relative;
+        }
+
+        .total-display {
+
+            width: 100%;
+
+            box-sizing: border-box;
+
+            padding: 12px 13px;
+
+            border: 1px solid #f9a8d4;
+
+            border-radius: 9px;
+
+            background: #fdf2f8;
+
+            color: #9d174d;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+            outline: none;
+        }
+
+
+        /* BUTTONS */
+
+        .form-actions {
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-top: 28px;
+
+            padding-top: 22px;
+
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .update-button {
+
+            border: none;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #db2777,
+                    #ec4899
+                );
+
+            color: white;
+
+            padding: 12px 20px;
+
+            border-radius: 8px;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 6px 16px
+                rgba(219, 39, 119, 0.20);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .update-button:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 10px 22px
+                rgba(219, 39, 119, 0.28);
+        }
+
+        .cancel-button {
+
+            display: inline-block;
+
+            text-decoration: none;
+
+            padding: 11px 18px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 8px;
+
+            background: white;
+
+            color: #475569;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            transition:
+                background 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .cancel-button:hover {
+
+            background: #f8fafc;
+
+            border-color: #94a3b8;
+        }
+
+
+        /* BACK */
+
+        .form-back {
+
+            margin-top: 18px;
+        }
+
+        .form-back a {
+
+            color: #2563eb;
+
+            text-decoration: none;
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+        .form-back a:hover {
+
+            text-decoration: underline;
+        }
+
+
+        /* MOBILE */
+
+        @media (max-width: 700px) {
+
+            .form-page {
+
+                margin: 20px 10px 40px;
+            }
+
+            .form-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+            .quotation-form {
+
+                padding: 20px;
+            }
+
+            .form-card-header {
+
+                padding: 22px;
+            }
+
+            .price-section {
+
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+
+                flex-direction: column-reverse;
+
+                align-items: stretch;
+            }
+
+            .update-button,
+            .cancel-button {
+
+                width: 100%;
+
+                text-align: center;
+
+                box-sizing: border-box;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>
+            Equipment Management System
+        </h1>
+
+        <p>
+            Equipment Inventory & Quotation Management
+        </p>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+
+    <nav>
+
+        <a href="/">
+            Dashboard
+        </a>
+
+        <a href="/view">
+            Equipment
+        </a>
+
+        <a href="/vendors">
+            Vendors
+        </a>
+
+        <a href="/quotations">
+            Quotations
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </nav>
+
+
+    <!-- FORM PAGE -->
+
+    <div class="form-page">
+
+
+        <div class="form-card">
+
+
+            <!-- HEADER -->
+
+            <div class="form-card-header">
+
+                <div class="form-icon">
+                    ✏️
+                </div>
+
+                <h2>
+                    Edit Quotation
+                </h2>
+
+                <p>
+                    Update the quotation and supplier
+                    pricing information below.
+                </p>
+
+            </div>
+
+
+            <!-- FORM -->
+
+            <form
+                method="POST"
+                class="quotation-form"
+            >
+
+
+                <div class="form-grid">
+
+
+                    <!-- QUOTATION NUMBER -->
+
+                    <div class="form-group">
+
+                        <label for="quotation_number">
+
+                            Quotation Number
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <span class="input-icon">
+                                #
+                            </span>
+
+                            <input
+                                type="text"
+                                id="quotation_number"
+                                name="quotation_no"
+                                value="{{ quotation[1] }}"
+                                required
+                            >
+
+                        </div>
+
+                        <span class="field-help">
+                            Supplier quotation reference number.
+                        </span>
+
+                    </div>
+
+
+                    <!-- DATE -->
+
+                    <div class="form-group">
+
+                        <label for="quotation_date">
+
+                            Quotation Date
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+                        <input
+                            type="date"
+                            id="quotation_date"
+                            name="date"
+                            value="{{ quotation[4] }}"
+                            required
+                        >
+
+                        <span class="field-help">
+                            Date of the quotation.
+                        </span>
+
+                    </div>
+
+
+                    <!-- VENDOR -->
+
+                    <div class="form-group">
+
+                        <label for="vendor_name">
+
+                            Vendor Name
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <span class="input-icon">
+                                🏢
+                            </span>
+
+                            <input
+                                type="text"
+                                id="vendor_name"
+                                name="vendor"
+                                value="{{ quotation[2] }}"
+                                required
+                            >
+
+                        </div>
+
+                        <span class="field-help">
+                            Supplier or vendor name.
+                        </span>
+
+                    </div>
+
+
+                    <!-- EQUIPMENT -->
+
+                    <div class="form-group">
+
+                        <label for="equipment_name">
+
+                            Equipment Name
+
+                            <span class="required">
+                                *
+                            </span>
+
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <span class="input-icon">
+                                📦
+                            </span>
+
+                            <input
+                                type="text"
+                                id="equipment_name"
+                                name="equipment"
+                                value="{{ quotation[3] }}"
+                                required
+                            >
+
+                        </div>
+
+                        <span class="field-help">
+                            Equipment covered by this quotation.
+                        </span>
+
+                    </div>
+
+
+                    <!-- PRICE SECTION -->
+
+                    <div class="price-section">
+
+
+                        <!-- QUANTITY -->
+
+                        <div class="form-group">
+
+                            <label for="quantity">
+
+                                Quantity
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+                            <div class="input-wrapper">
+
+                                <span class="input-icon">
+                                    #
+                                </span>
+
+                                <input
+                                    type="number"
+                                    id="quantity"
+                                    name="quantity"
+                                    min="1"
+                                    value="{{ quotation[5] }}"
+                                    required
+                                >
+
+                            </div>
+
+                            <span class="field-help">
+                                Number of units.
+                            </span>
+
+                        </div>
+
+
+                        <!-- UNIT PRICE -->
+
+                        <div class="form-group">
+
+                            <label for="unit_price">
+
+                                Unit Price (₹)
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+                            <div class="input-wrapper">
+
+                                <span class="input-icon">
+                                    ₹
+                                </span>
+
+                                <input
+                                    type="number"
+                                    id="unit_price"
+                                    name="unit_price"
+                                    min="0"
+                                    step="0.01"
+                                    value="{{ quotation[6] }}"
+                                    required
+                                >
+
+                            </div>
+
+                            <span class="field-help">
+                                Price per unit.
+                            </span>
+
+                        </div>
+
+
+                        <!-- TOTAL -->
+
+                        <div class="form-group total-wrapper">
+
+                            <label for="total_amount">
+
+                                Total Amount (₹)
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="total_amount"
+                                class="total-display"
+                                readonly
+                            >
+
+                            <span class="field-help">
+                                Automatically calculated.
+                            </span>
+
+                        </div>
+
+
+                        <!-- STATUS -->
+
+                        <div class="form-group">
+
+                            <label for="status">
+
+                                Status
+
+                                <span class="required">
+                                    *
+                                </span>
+
+                            </label>
+
+                            <select
+                                id="status"
+                                name="status"
+                                required
+                            >
+
+                                <option
+                                    value="Pending"
+
+                                    {% if quotation[8] == "Pending" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Pending
+                                </option>
+
+
+                                <option
+                                    value="Approved"
+
+                                    {% if quotation[8] == "Approved" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Approved
+                                </option>
+
+
+                                <option
+                                    value="Rejected"
+
+                                    {% if quotation[8] == "Rejected" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    Rejected
+                                </option>
+
+                            </select>
+
+                            <span class="field-help">
+                                Current quotation status.
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- BUTTONS -->
+
+                <div class="form-actions">
+
+                    <a
+                        href="/quotations"
+                        class="cancel-button"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="update-button"
+                    >
+                        ✓ Update Quotation
+                    </button>
+
+                </div>
+
+
+            </form>
+
+
+        </div>
+
+
+        <!-- BACK -->
+
+        <div class="form-back">
+
+            <a href="/quotations">
+                ← Back to Quotations
+            </a>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- TOTAL CALCULATION -->
+
+<script>
+
+    const quantityInput =
+        document.getElementById("quantity");
+
+    const unitPriceInput =
+        document.getElementById("unit_price");
+
+    const totalAmountInput =
+        document.getElementById("total_amount");
+
+
+    function calculateTotal() {
+
+        const quantity =
+            parseFloat(quantityInput.value) || 0;
+
+        const unitPrice =
+            parseFloat(unitPriceInput.value) || 0;
+
+        const total =
+            quantity * unitPrice;
+
+
+        totalAmountInput.value =
+            "₹ " +
+            total.toLocaleString(
+                "en-IN",
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            );
+
+    }
+
+
+    quantityInput.addEventListener(
+        "input",
+        calculateTotal
+    );
+
+
+    unitPriceInput.addEventListener(
+        "input",
+        calculateTotal
+    );
+
+
+    calculateTotal();
+
+</script>
+
+
+</body>
+
+</html>

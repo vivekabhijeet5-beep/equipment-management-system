@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Equipment Details</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>Equipment Management System</h1>
+
+        <p>Equipment Inventory & Quotation Management</p>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+
+    <nav>
+
+        <a href="/">Dashboard</a>
+
+        <a href="/view">Equipment</a>
+
+        <a href="/vendors">Vendors</a>
+
+        <a href="/quotations">Quotations</a>
+
+    </nav>
+
+
+    <!-- EQUIPMENT DETAILS -->
+
+    <main>
+
+        <div class="page-header">
+
+            <div>
+
+                <h2>Equipment Details</h2>
+
+                <p class="welcome">
+                    Detailed information about this equipment
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- DETAILS CARD -->
+
+        <div class="details-card">
+
+            <div class="detail-row">
+
+                <strong>Equipment ID</strong>
+
+                <span>
+                    {{ equipment[0] }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <strong>Equipment Name</strong>
+
+                <span>
+                    {{ equipment[1] }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <strong>Model</strong>
+
+                <span>
+                    {{ equipment[2] }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <strong>Quantity</strong>
+
+                <span>
+                    {{ equipment[3] }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <strong>Location</strong>
+
+                <span>
+                    {{ equipment[4] }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <strong>Status</strong>
+
+                <span class="status">
+                    {{ equipment[5] }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-row">
+
+                <strong>Vendor</strong>
+
+                <span>
+                    {{ equipment[6] }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTION BUTTONS -->
+
+        <div class="actions">
+
+            <a href="/update/{{ equipment[0] }}">
+
+                <button>
+                    Edit Equipment
+                </button>
+
+            </a>
+
+
+            <a
+                href="/delete/{{ equipment[0] }}"
+                onclick="return confirm('Are you sure you want to delete this equipment?');"
+            >
+
+                <button>
+                    Delete Equipment
+                </button>
+
+            </a>
+
+        </div>
+
+
+        <!-- BACK LINKS -->
+
+        <div class="back-link">
+
+            <a href="/view">
+                ← Back to Equipment
+            </a>
+
+            &nbsp;&nbsp;
+
+            <a href="/">
+                ← Dashboard
+            </a>
+
+        </div>
+
+    </main>
+
+
+</body>
+
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Search Equipment</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>Equipment Management System</h1>
+
+        <p>Equipment Inventory & Quotation Management</p>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+
+    <nav>
+
+        <a href="/">Dashboard</a>
+
+        <a href="/view">Equipment</a>
+
+        <a href="/vendors">Vendors</a>
+
+        <a href="/quotations">Quotations</a>
+
+    </nav>
+
+
+    <!-- PAGE HEADER -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h2>Search Equipment</h2>
+
+            <p class="welcome">
+                Find equipment by name, model, location, status or vendor.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- SEARCH BOX -->
+
+    <div class="search-box">
+
+        <form action="/search" method="GET">
+
+            <input
+                type="text"
+                name="query"
+                value="{{ query }}"
+                placeholder="Search equipment, model, location, vendor..."
+                required
+            >
+
+            <button type="submit">
+                Search
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- SEARCH RESULTS -->
+
+    {% if equipment %}
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Equipment</th>
+
+                    <th>Model</th>
+
+                    <th>Quantity</th>
+
+                    <th>Location</th>
+
+                    <th>Status</th>
+
+                    <th>Vendor</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for item in equipment %}
+
+                <tr>
+
+                    <td>
+                        {{ item[0] }}
+                    </td>
+
+                    <td>
+                        <strong>{{ item[1] }}</strong>
+                    </td>
+
+                    <td>
+                        {{ item[2] }}
+                    </td>
+
+                    <td>
+                        {{ item[3] }}
+                    </td>
+
+                    <td>
+                        {{ item[4] }}
+                    </td>
+
+                    <td>
+                        <span class="status">
+                            {{ item[5] }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ item[6] }}
+                    </td>
+
+                    <td>
+
+                        <a
+                            href="/update/{{ item[0] }}"
+                            class="edit-link"
+                        >
+                            Edit
+                        </a>
+
+                        <a
+                            href="/delete/{{ item[0] }}"
+                            class="delete-link"
+                            onclick="return confirm('Are you sure you want to delete this equipment?');"
+                        >
+                            Delete
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% elif query %}
+
+    <!-- NO RESULTS -->
+
+    <div class="empty-state">
+
+        <h3>No Equipment Found</h3>
+
+        <p>
+            No equipment matched:
+            <strong>"{{ query }}"</strong>
+        </p>
+
+        <a href="/view">
+            Back to Equipment
+        </a>
+
+    </div>
+
+
+    {% else %}
+
+    <!-- INITIAL STATE -->
+
+    <div class="empty-state">
+
+        <h3>Search Equipment</h3>
+
+        <p>
+            Enter a search term above to find equipment.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- BACK -->
+
+    <div class="back-link">
+
+        <a href="/view">
+            ← Back to Equipment
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
