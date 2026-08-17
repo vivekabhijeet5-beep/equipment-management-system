@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash, session, send_file
+from flask import Flask, render_template, request, redirect, flash, session, send_file, g
 import mysql.connector
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
@@ -22,12 +22,37 @@ app.secret_key = os.getenv("SECRET_KEY")
 # MYSQL DATABASE CONNECTION
 # ============================================================
 
-db = mysql.connector.connect(
-    host=os.getenv("MYSQL_HOST"),
-    user=os.getenv("MYSQL_USER"),
-    password=os.getenv("MYSQL_PASSWORD"),
-    database=os.getenv("MYSQL_DATABASE")
-)
+def get_db_connection():
+    return mysql.connector.connect(
+        host=os.getenv("MYSQLHOST") or os.getenv("MYSQL_HOST"),
+        port=int(os.getenv("MYSQLPORT", "3306")),
+        user=os.getenv("MYSQLUSER") or os.getenv("MYSQL_USER"),
+        password=os.getenv("MYSQLPASSWORD") or os.getenv("MYSQL_PASSWORD"),
+        database=os.getenv("MYSQLDATABASE") or os.getenv("MYSQL_DATABASE"),
+        connection_timeout=10
+    )
+
+
+# ============================================================
+# DATABASE CONNECTION PER REQUEST
+# ============================================================
+
+@app.before_request
+def open_db_connection():
+    # Login creates its own connection so database errors can be
+    # handled inside the login route.
+    if request.endpoint in ("login", "logout"):
+        return
+
+    g.db = get_db_connection()
+
+
+@app.teardown_request
+def close_db_connection(exception=None):
+    db = g.pop("db", None)
+
+    if db and db.is_connected():
+        db.close()
 
 
 # ============================================================
@@ -50,34 +75,48 @@ def login():
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "").strip()
 
-        cursor = db.cursor()
+        db = None
+        cursor = None
 
-        cursor.execute("""
-            SELECT user_id, username
-            FROM users
-            WHERE username = %s AND password = %s
-        """, (username, password))
+        try:
+            db = get_db_connection()
+            cursor = db.cursor()
 
-        user = cursor.fetchone()
+            cursor.execute("""
+                SELECT user_id, username
+                FROM users
+                WHERE username = %s AND password = %s
+            """, (username, password))
 
-        cursor.close()
+            user = cursor.fetchone()
 
-        if user:
+            if user:
+                session["user_id"] = user[0]
+                session["username"] = user[1]
 
-            session["user_id"] = user[0]
-            session["username"] = user[1]
+                return redirect("/")
 
-            return redirect("/")
+            return render_template(
+                "login.html",
+                error="Invalid username or password"
+            )
 
-        return render_template(
-            "login.html",
-            error="Invalid username or password"
-        )
+        except mysql.connector.Error as e:
+            print("MySQL Error:", e)
+
+            return render_template(
+                "login.html",
+                error="Database connection error. Please try again."
+            )
+
+        finally:
+            if cursor:
+                cursor.close()
+
+            if db and db.is_connected():
+                db.close()
 
     return render_template("login.html")
-
-
-# ============================================================
 # LOGOUT
 # ============================================================
 
@@ -99,7 +138,7 @@ def index():
     if not login_required():
         return redirect("/login")
 
-    cursor = db.cursor()
+    cursor = g.db.cursor()
 
     cursor.execute("""
         SELECT COUNT(*)
@@ -173,7 +212,7 @@ def view_equipment():
     if not login_required():
         return redirect("/login")
 
-    cursor = db.cursor()
+    cursor = g.db.cursor()
 
     cursor.execute("""
         SELECT *
@@ -201,7 +240,7 @@ def equipment_details(equipment_id):
     if not login_required():
         return redirect("/login")
 
-    cursor = db.cursor()
+    cursor = g.db.cursor()
 
     cursor.execute("""
         SELECT *
@@ -290,7 +329,7 @@ def add_equipment():
 
             return redirect("/add")
 
-        cursor = db.cursor()
+        cursor = g.db.cursor()
 
         cursor.execute("""
             INSERT INTO equipment
@@ -312,7 +351,7 @@ def add_equipment():
             vendor
         ))
 
-        db.commit()
+        g.db.commit()
         cursor.close()
 
         flash(
@@ -335,7 +374,7 @@ def update_equipment(equipment_id):
     if not login_required():
         return redirect("/login")
 
-    cursor = db.cursor()
+    cursor = g.db.cursor()
 
     if request.method == "POST":
 
@@ -423,7 +462,7 @@ def update_equipment(equipment_id):
             equipment_id
         ))
 
-        db.commit()
+        g.db.commit()
         cursor.close()
 
         flash(
@@ -462,14 +501,14 @@ def delete_equipment(equipment_id):
     if not login_required():
         return redirect("/login")
 
-    cursor = db.cursor()
+    cursor = g.db.cursor()
 
     cursor.execute("""
         DELETE FROM equipment
         WHERE id = %s
     """, (equipment_id,))
 
-    db.commit()
+    g.db.commit()
     cursor.close()
 
     flash(
@@ -494,7 +533,7 @@ def search_equipment():
         "query", ""
     ).strip()
 
-    cursor = db.cursor()
+    cursor = g.db.cursor()
 
     if query:
 
@@ -546,7 +585,7 @@ def vendors():
     if not login_required():
         return redirect("/login")
 
-    cursor = db.cursor()
+    cursor = g.db.cursor()
 
     cursor.execute("""
         SELECT *
@@ -605,7 +644,7 @@ def add_vendor():
 
             return redirect("/add_vendor")
 
-        cursor = db.cursor()
+        cursor = g.db.cursor()
 
         cursor.execute("""
             INSERT INTO vendors
@@ -625,7 +664,7 @@ def add_vendor():
             address
         ))
 
-        db.commit()
+        g.db.commit()
         cursor.close()
 
         flash(
@@ -651,7 +690,7 @@ def edit_vendor(vendor_id):
     if not login_required():
         return redirect("/login")
 
-    cursor = db.cursor()
+    cursor = g.db.cursor()
 
     if request.method == "POST":
 
@@ -706,7 +745,7 @@ def edit_vendor(vendor_id):
             vendor_id
         ))
 
-        db.commit()
+        g.db.commit()
         cursor.close()
 
         flash(
@@ -745,14 +784,14 @@ def delete_vendor(vendor_id):
     if not login_required():
         return redirect("/login")
 
-    cursor = db.cursor()
+    cursor = g.db.cursor()
 
     cursor.execute("""
         DELETE FROM vendors
         WHERE vendor_id = %s
     """, (vendor_id,))
 
-    db.commit()
+    g.db.commit()
     cursor.close()
 
     flash(
@@ -777,7 +816,7 @@ def quotations():
         "query", ""
     ).strip()
 
-    cursor = db.cursor()
+    cursor = g.db.cursor()
 
     if query:
 
@@ -909,7 +948,7 @@ def add_quotation():
 
         total_amount = quantity * unit_price
 
-        cursor = db.cursor()
+        cursor = g.db.cursor()
 
         cursor.execute("""
             INSERT INTO quotations
@@ -935,7 +974,7 @@ def add_quotation():
             status
         ))
 
-        db.commit()
+        g.db.commit()
         cursor.close()
 
         flash(
@@ -961,7 +1000,7 @@ def edit_quotation(quotation_id):
     if not login_required():
         return redirect("/login")
 
-    cursor = db.cursor()
+    cursor = g.db.cursor()
 
     if request.method == "POST":
 
@@ -1061,7 +1100,7 @@ def edit_quotation(quotation_id):
             quotation_id
         ))
 
-        db.commit()
+        g.db.commit()
         cursor.close()
 
         flash(
@@ -1109,14 +1148,14 @@ def delete_quotation(quotation_id):
     if not login_required():
         return redirect("/login")
 
-    cursor = db.cursor()
+    cursor = g.db.cursor()
 
     cursor.execute("""
         DELETE FROM quotations
         WHERE quotation_id = %s
     """, (quotation_id,))
 
-    db.commit()
+    g.db.commit()
     cursor.close()
 
     flash(
@@ -1137,7 +1176,7 @@ def quotation_pdf(quotation_id):
     if not login_required():
         return redirect("/login")
 
-    cursor = db.cursor()
+    cursor = g.db.cursor()
 
     cursor.execute("""
         SELECT
