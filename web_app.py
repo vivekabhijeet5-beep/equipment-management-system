@@ -585,13 +585,39 @@ def vendors():
     if not login_required():
         return redirect("/login")
 
+    query = request.args.get("query", "").strip()
+
     cursor = g.db.cursor()
 
-    cursor.execute("""
-        SELECT *
-        FROM vendors
-        ORDER BY vendor_id DESC
-    """)
+    if query:
+
+        search_value = "%" + query + "%"
+
+        cursor.execute("""
+            SELECT *
+            FROM vendors
+            WHERE
+                vendor_name LIKE %s
+                OR contact_person LIKE %s
+                OR phone LIKE %s
+                OR email LIKE %s
+                OR address LIKE %s
+            ORDER BY vendor_id DESC
+        """, (
+            search_value,
+            search_value,
+            search_value,
+            search_value,
+            search_value
+        ))
+
+    else:
+
+        cursor.execute("""
+            SELECT *
+            FROM vendors
+            ORDER BY vendor_id DESC
+        """)
 
     vendor_list = cursor.fetchall()
 
@@ -599,7 +625,8 @@ def vendors():
 
     return render_template(
         "vendors.html",
-        vendors=vendor_list
+        vendors=vendor_list,
+        query=query
     )
 
 
